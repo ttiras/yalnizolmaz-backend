@@ -15,3 +15,14 @@ insert_permissions:
         - id
         - updated_at
     comment: ""
+select_permissions:
+  - role: user
+    permission:
+      columns:
+        - content
+        - created_at
+        - updated_at
+        - id
+        - user_id
+      filter: {}
+    comment: ""
