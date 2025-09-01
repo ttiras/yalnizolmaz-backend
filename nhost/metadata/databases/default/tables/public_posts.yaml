@@ -1,6 +1,21 @@
 table:
   name: posts
   schema: public
+array_relationships:
+  - name: post_comments
+    using:
+      foreign_key_constraint_on:
+        column: post_id
+        table:
+          name: post_comments
+          schema: public
+  - name: post_likes
+    using:
+      foreign_key_constraint_on:
+        column: post_id
+        table:
+          name: post_likes
+          schema: public
 insert_permissions:
   - role: user
     permission:
@@ -25,4 +40,22 @@ select_permissions:
         - id
         - user_id
       filter: {}
+    comment: ""
+update_permissions:
+  - role: user
+    permission:
+      columns:
+        - content
+        - updated_at
+      filter:
+        user_id:
+          _eq: X-Hasura-User-Id
+      check: null
+    comment: ""
+delete_permissions:
+  - role: user
+    permission:
+      filter:
+        user_id:
+          _eq: X-Hasura-User-Id
     comment: ""
