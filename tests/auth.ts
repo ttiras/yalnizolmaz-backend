@@ -56,6 +56,28 @@ function fetchWithTimeout(url: string, init: RequestInit, timeoutMs = DEFAULT_HT
   return fetch(url, { ...init, signal: ctrl.signal }).finally(() => clearTimeout(t));
 }
 
+// Decode JWT to extract user id when using bearer override on staging
+function decodeBase64Url(b64url: string) {
+  const pad = '='.repeat((4 - (b64url.length % 4)) % 4);
+  const b64 = (b64url + pad).replace(/-/g, '+').replace(/_/g, '/');
+  try { return Buffer.from(b64, 'base64').toString('utf8'); } catch { return ''; }
+}
+function userIdFromJwt(token: string): string {
+  try {
+    const parts = token.split('.');
+    if (parts.length < 2) return '';
+    const payloadStr = decodeBase64Url(parts[1]);
+    const payload = payloadStr ? JSON.parse(payloadStr) as any : null;
+    if (!payload || typeof payload !== 'object') return '';
+    const hasura = payload['https://hasura.io/jwt/claims'];
+    if (hasura && typeof hasura['x-hasura-user-id'] === 'string' && hasura['x-hasura-user-id']) {
+      return hasura['x-hasura-user-id'];
+    }
+    if (typeof payload.sub === 'string' && payload.sub) return payload.sub;
+    return '';
+  } catch { return ''; }
+}
+
 // Optionally auto-provision users on environments where admin secret is available (e.g., staging)
 const ADMIN_SECRET = (process.env.HASURA_ADMIN_SECRET || '').trim();
 async function ensureUserExists(email: string, password: string) {
@@ -196,7 +218,8 @@ async function refresh(refreshToken: string): Promise<{ accessToken: string; acc
 
 async function getFreshSession(email: string, password: string, bearerOverride?: string): Promise<PersistedSession> {
   if (bearerOverride) {
-    return { userId: 'override', accessToken: bearerOverride, refreshToken: '', accessExp: nowSec() + 3600 };
+    const decodedUserId = userIdFromJwt(bearerOverride) || 'override';
+    return { userId: decodedUserId, accessToken: bearerOverride, refreshToken: '', accessExp: nowSec() + 3600 };
   }
   const cached = readSessionFromDisk(email);
   if (cached) {
