@@ -1,0 +1,1 @@
+CREATE TABLE "public"."user_blocks" ("blocker_id" uuid NOT NULL, "blocked_id" uuid NOT NULL, "created_at" timestamptz NOT NULL DEFAULT now(), PRIMARY KEY ("blocker_id","blocked_id") , FOREIGN KEY ("blocker_id") REFERENCES "auth"."users"("id") ON UPDATE no action ON DELETE set null, FOREIGN KEY ("blocked_id") REFERENCES "auth"."users"("id") ON UPDATE no action ON DELETE set null);

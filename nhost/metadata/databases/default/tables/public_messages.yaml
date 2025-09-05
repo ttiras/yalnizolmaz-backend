@@ -1,0 +1,57 @@
+table:
+  name: messages
+  schema: public
+object_relationships:
+  - name: receiver
+    using:
+      foreign_key_constraint_on: recipient_id
+  - name: sender
+    using:
+      foreign_key_constraint_on: sender_id
+insert_permissions:
+  - role: user
+    permission:
+      check:
+        _and:
+          - sender_id:
+              _eq: X-Hasura-User-Id
+          - recipient_id:
+              _neq: X-Hasura-User-Id
+          - receiver:
+              _and:
+                - _or:
+                    - metadata:
+                        _is_null: true
+                    - _not:
+                        metadata:
+                          _has_key: dms_off
+                - _not:
+                    blocks_outgoing:
+                      blocked_id:
+                        _eq: X-Hasura-User-Id
+      set:
+        sender_id: x-hasura-User-Id
+      columns:
+        - body
+        - created_at
+        - id
+        - recipient_id
+        - updated_at
+    comment: ""
+select_permissions:
+  - role: user
+    permission:
+      columns:
+        - id
+        - body
+        - created_at
+        - updated_at
+        - recipient_id
+        - sender_id
+      filter:
+        _or:
+          - recipient_id:
+              _eq: X-Hasura-User-Id
+          - sender_id:
+              _eq: X-Hasura-User-Id
+    comment: ""

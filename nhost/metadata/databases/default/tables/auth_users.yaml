@@ -92,6 +92,13 @@ object_relationships:
     using:
       foreign_key_constraint_on: default_role
 array_relationships:
+  - name: blocks_outgoing
+    using:
+      foreign_key_constraint_on:
+        column: blocker_id
+        table:
+          name: user_blocks
+          schema: public
   - name: refreshTokens
     using:
       foreign_key_constraint_on:
