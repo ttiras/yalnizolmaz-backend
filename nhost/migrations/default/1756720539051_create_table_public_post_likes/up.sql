@@ -1,0 +1,1 @@
+CREATE TABLE "public"."post_likes" ("post_id" uuid NOT NULL, "user_id" uuid NOT NULL, "created_at" timestamptz NOT NULL DEFAULT now(), PRIMARY KEY ("post_id","user_id") , FOREIGN KEY ("post_id") REFERENCES "public"."posts"("id") ON UPDATE no action ON DELETE cascade, FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id") ON UPDATE no action ON DELETE set null);

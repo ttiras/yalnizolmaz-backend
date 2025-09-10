@@ -1,0 +1,39 @@
+# Cursor rules for nhost repository
+
+- The monorepo root directory `yalnizolmaz` is not a Git repository. `nhost/` and `web/` are separate Git repositories.
+- Commit and push from within `nhost/` when working on backend (Hasura/Nhost) code; commit and push from within `web/` when working on the Next.js app.
+
+# Testing & RLS patterns
+- When Row Level Security denies an operation, Hasura often returns success with null data for updates/deletes, but insert permission checks typically return a GraphQL error. Tests should assert accordingly.
+
+# Direct Messages (DMs) policy reference
+- messages insert (role user):
+  - Column preset: `sender_id = x-hasura-User-Id`.
+  - Custom check ensures default-accept and block enforcement via relationships:
+    {
+      "_and": [
+        { "sender_id": { "_eq": "X-Hasura-User-Id" } },
+        { "recipient_id": { "_neq": "X-Hasura-User-Id" } },
+        {
+          "receiver": {
+            "_and": [
+              {
+                "_or": [
+                  { "metadata": { "_is_null": true } },
+                  { "_not": { "metadata": { "_has_key": "dms_off" } } }
+                ]
+              },
+              {
+                "_not": {
+                  "blocks_outgoing": {
+                    "blocked_id": { "_eq": "X-Hasura-User-Id" }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+
+

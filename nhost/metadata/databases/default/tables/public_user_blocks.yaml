@@ -1,0 +1,43 @@
+table:
+  name: user_blocks
+  schema: public
+object_relationships:
+  - name: blocked
+    using:
+      foreign_key_constraint_on: blocked_id
+  - name: blocker
+    using:
+      foreign_key_constraint_on: blocker_id
+insert_permissions:
+  - role: user
+    permission:
+      check:
+        blocker_id:
+          _eq: X-Hasura-User-Id
+      set:
+        blocker_id: x-hasura-User-Id
+      columns:
+        - blocked_id
+        - created_at
+    comment: ""
+select_permissions:
+  - role: user
+    permission:
+      columns:
+        - created_at
+        - blocked_id
+        - blocker_id
+      filter:
+        _or:
+          - blocked_id:
+              _eq: X-Hasura-User-Id
+          - blocker_id:
+              _eq: X-Hasura-User-Id
+    comment: ""
+delete_permissions:
+  - role: user
+    permission:
+      filter:
+        blocker_id:
+          _eq: X-Hasura-User-Id
+    comment: ""
