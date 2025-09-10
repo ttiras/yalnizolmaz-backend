@@ -1,0 +1,73 @@
+table:
+  name: user_profiles
+  schema: public
+object_relationships:
+  - name: user
+    using:
+      foreign_key_constraint_on: user_id
+insert_permissions:
+  - role: user
+    permission:
+      check:
+        user_id:
+          _eq: X-Hasura-User-Id
+      set:
+        user_id: x-hasura-User-Id
+      columns:
+        - avatar_url
+        - bio
+        - created_at
+        - display_name
+        - location
+        - updated_at
+        - website
+    comment: ""
+select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+        - avatar_url
+        - bio
+        - display_name
+        - location
+        - website
+        - created_at
+        - updated_at
+        - user_id
+      filter: {}
+    comment: ""
+  - role: user
+    permission:
+      columns:
+        - avatar_url
+        - bio
+        - display_name
+        - location
+        - website
+        - created_at
+        - updated_at
+        - user_id
+      filter: {}
+    comment: ""
+update_permissions:
+  - role: user
+    permission:
+      columns:
+        - avatar_url
+        - bio
+        - display_name
+        - location
+        - updated_at
+        - website
+      filter:
+        user_id:
+          _eq: X-Hasura-User-Id
+      check: null
+    comment: ""
+delete_permissions:
+  - role: user
+    permission:
+      filter:
+        user_id:
+          _eq: X-Hasura-User-Id
+    comment: ""
