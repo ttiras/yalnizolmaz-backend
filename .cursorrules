@@ -1,39 +1,33 @@
-# Cursor rules for nhost repository
+# Cursor Rules for Nhost backend (Hasura)
 
-- The monorepo root directory `yalnizolmaz` is not a Git repository. `nhost/` and `web/` are separate Git repositories.
-- Commit and push from within `nhost/` when working on backend (Hasura/Nhost) code; commit and push from within `web/` when working on the Next.js app.
+## Scope
+- Applies to the `nhost/` workspace.
 
-# Testing & RLS patterns
-- When Row Level Security denies an operation, Hasura often returns success with null data for updates/deletes, but insert permission checks typically return a GraphQL error. Tests should assert accordingly.
+## Core policy
+- Do NOT hand-edit Hasura metadata YAML or write manual SQL migrations for tables, permissions, or relationships.
+- All changes to tables/permissions/relationships must be performed via one of:
+  - Hasura Console/UI (Data/Permissions tabs), or
+  - SQL run in Hasura Console “Run SQL”, or
+  - Hasura Metadata API (e.g., curl) when not expressible in plain SQL.
+- Migration/metadata files are generated automatically by Hasura from those actions. We rely on this so local Hasura state matches tests.
+- Never commit or push changes unless the user explicitly requests it.
 
-# Direct Messages (DMs) policy reference
-- messages insert (role user):
-  - Column preset: `sender_id = x-hasura-User-Id`.
-  - Custom check ensures default-accept and block enforcement via relationships:
-    {
-      "_and": [
-        { "sender_id": { "_eq": "X-Hasura-User-Id" } },
-        { "recipient_id": { "_neq": "X-Hasura-User-Id" } },
-        {
-          "receiver": {
-            "_and": [
-              {
-                "_or": [
-                  { "metadata": { "_is_null": true } },
-                  { "_not": { "metadata": { "_has_key": "dms_off" } } }
-                ]
-              },
-              {
-                "_not": {
-                  "blocks_outgoing": {
-                    "blocked_id": { "_eq": "X-Hasura-User-Id" }
-                  }
-                }
-              }
-            ]
-          }
-        }
-      ]
-    }
+## When the user asks for changes
+- If the request can be done in SQL (create table/columns/indexes, PostgreSQL RLS policies, triggers):
+  - Provide ONLY the SQL statements to run in Hasura Console “Run SQL”.
+- If it cannot be done in pure SQL (e.g., Hasura permission rules, relationships, root field customizations):
+  - Provide the correct Hasura Metadata API commands (e.g., terminal curl) or concise UI steps.
+  - Prefer safe, idempotent metadata API examples.
+
+## Allowed edits in repo
+- Tests under `nhost/tests/`.
+- Helper scripts under `nhost/scripts/`.
+- Documentation and non-metadata config (e.g., this `.cursorrules`, `nhost/nhost.toml`).
+
+## Disallowed edits (unless explicitly mirroring auto-generated output)
+- Manual edits under `nhost/nhost/metadata/**` or `nhost/nhost/migrations/**` that create/modify tables, permissions, or relationships.
+
+## Rationale
+- Ensures changes are applied to the live local Hasura instance first so that auto-generated migrations/metadata stay in sync and tests run against the real state.
 
 
