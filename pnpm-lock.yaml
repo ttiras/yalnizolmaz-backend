@@ -11,6 +11,9 @@ importers:
       '@types/node':
         specifier: ^24.3.0
         version: 24.3.0
+      debug:
+        specifier: ^4.4.1
+        version: 4.4.1
       dotenv:
         specifier: ^16.4.5
         version: 16.6.1

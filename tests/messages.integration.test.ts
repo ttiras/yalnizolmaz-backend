@@ -17,7 +17,7 @@ const SEND_MESSAGE = `mutation($recipientId: uuid!, $body: String!) {
 const THREAD_WITH = `query($otherId: uuid!) {
   messages(
     where: { _or: [ { sender_id: { _eq: $otherId } }, { recipient_id: { _eq: $otherId } } ] },
-    order_by: { created_at: asc },
+    order_by: { created_at: desc },
     limit: 20
   ) {
     id sender_id recipient_id body
@@ -126,6 +126,15 @@ describe('messages integration', () => {
     const bodies1 = new Set((page1.data?.messages ?? []).map((m:any)=>m.body));
     const overlap = (page2.data?.messages ?? []).some((m:any)=>bodies1.has(m.body));
     expect(overlap).toBe(false);
+  });
+
+  it('denies sending a DM to self', async () => {
+    const a = await sessionA();
+    // Ensure prefs row exists for A (though rule also checks recipient != sender)
+    await rawGraphql(ENSURE_PREF_ROW, undefined, a.token);
+    const attempt = await rawGraphql(SEND_MESSAGE, { recipientId: a.userId, body: 'self' }, a.token);
+    expect((attempt.errors?.length ?? 0)).toBeGreaterThan(0);
+    expect(attempt.data?.insert_messages_one).toBeUndefined();
   });
 
   it('respects recipient dms_off: blocks incoming DMs when true, allows when false', async () => {
