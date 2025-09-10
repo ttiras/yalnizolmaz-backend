@@ -1,0 +1,11 @@
+-- (Optional) Blog comment reports
+CREATE TABLE public.blog_comment_reports (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  comment_id uuid NOT NULL REFERENCES public.blog_comments(id) ON DELETE CASCADE,
+  reporter_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE SET NULL,
+  reason text NOT NULL,
+  details text,
+  status text NOT NULL DEFAULT 'pending',
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE UNIQUE INDEX blog_comment_reports_unique_per_user ON public.blog_comment_reports (comment_id, reporter_id);
