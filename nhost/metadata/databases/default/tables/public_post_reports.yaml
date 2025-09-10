@@ -1,0 +1,59 @@
+table:
+  name: post_reports
+  schema: public
+object_relationships:
+  - name: post
+    using:
+      foreign_key_constraint_on: post_id
+  - name: user
+    using:
+      foreign_key_constraint_on: reporter_id
+insert_permissions:
+  - role: user
+    permission:
+      check:
+        reporter_id:
+          _eq: X-Hasura-User-Id
+      set:
+        reporter_id: x-hasura-User-Id
+      columns:
+        - created_at
+        - details
+        - id
+        - post_id
+        - reason
+        - status
+    comment: ""
+select_permissions:
+  - role: user
+    permission:
+      columns:
+        - details
+        - reason
+        - status
+        - created_at
+        - id
+        - post_id
+        - reporter_id
+      filter:
+        reporter_id:
+          _eq: X-Hasura-User-Id
+    comment: ""
+update_permissions:
+  - role: user
+    permission:
+      columns:
+        - details
+        - reason
+      filter: {}
+      check:
+        reporter_id:
+          _eq: X-Hasura-User-Id
+    comment: ""
+delete_permissions:
+  - role: user
+    permission:
+      filter:
+        reporter_id:
+          _eq: X-Hasura-User-Id
+    comment: ""

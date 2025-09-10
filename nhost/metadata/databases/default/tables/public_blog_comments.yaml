@@ -1,27 +1,27 @@
 table:
-  name: posts
+  name: blog_comments
   schema: public
+object_relationships:
+  - name: parent
+    using:
+      foreign_key_constraint_on: parent_id
+  - name: user
+    using:
+      foreign_key_constraint_on: user_id
 array_relationships:
-  - name: post_bookmarks
+  - name: blog_comment_helpfuls
     using:
       foreign_key_constraint_on:
-        column: post_id
+        column: comment_id
         table:
-          name: post_bookmarks
+          name: blog_comment_helpful
           schema: public
-  - name: post_comments
+  - name: replies
     using:
       foreign_key_constraint_on:
-        column: post_id
+        column: parent_id
         table:
-          name: post_comments
-          schema: public
-  - name: post_likes
-    using:
-      foreign_key_constraint_on:
-        column: post_id
-        table:
-          name: post_likes
+          name: blog_comments
           schema: public
 insert_permissions:
   - role: user
@@ -32,29 +32,38 @@ insert_permissions:
       set:
         user_id: x-hasura-User-Id
       columns:
-        - content
+        - blog_slug
+        - body
         - created_at
         - id
+        - is_helpful
+        - parent_id
         - updated_at
     comment: ""
 select_permissions:
   - role: anonymous
     permission:
       columns:
-        - content
+        - is_helpful
+        - blog_slug
+        - body
         - created_at
         - updated_at
         - id
+        - parent_id
         - user_id
       filter: {}
     comment: ""
   - role: user
     permission:
       columns:
-        - content
+        - is_helpful
+        - blog_slug
+        - body
         - created_at
         - updated_at
         - id
+        - parent_id
         - user_id
       filter: {}
     comment: ""
@@ -62,7 +71,7 @@ update_permissions:
   - role: user
     permission:
       columns:
-        - content
+        - body
         - updated_at
       filter:
         user_id:

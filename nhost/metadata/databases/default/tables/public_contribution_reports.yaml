@@ -1,0 +1,59 @@
+table:
+  name: contribution_reports
+  schema: public
+object_relationships:
+  - name: contribution
+    using:
+      foreign_key_constraint_on: contribution_id
+  - name: user
+    using:
+      foreign_key_constraint_on: reporter_id
+insert_permissions:
+  - role: user
+    permission:
+      check:
+        reporter_id:
+          _eq: X-Hasura-User-Id
+      set:
+        reporter_id: x-hasura-User-Id
+      columns:
+        - contribution_id
+        - created_at
+        - details
+        - id
+        - reason
+        - status
+    comment: ""
+select_permissions:
+  - role: user
+    permission:
+      columns:
+        - details
+        - reason
+        - status
+        - created_at
+        - contribution_id
+        - id
+        - reporter_id
+      filter:
+        reporter_id:
+          _eq: X-Hasura-User-Id
+    comment: ""
+update_permissions:
+  - role: user
+    permission:
+      columns:
+        - details
+        - reason
+      filter:
+        reporter_id:
+          _eq: X-Hasura-User-Id
+      check: null
+    comment: ""
+delete_permissions:
+  - role: user
+    permission:
+      filter:
+        reporter_id:
+          _eq: X-Hasura-User-Id
+    comment: ""

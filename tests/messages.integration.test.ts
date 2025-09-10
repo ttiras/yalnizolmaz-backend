@@ -70,4 +70,40 @@ describe('messages integration', () => {
     const unblk = await rawGraphql(DELETE_BLOCK, { blockerId: b.userId, blockedId: a.userId }, b.token);
     expect(unblk.errors).toBeUndefined();
   });
+
+  it('supports pagination and ordering on messages list', async () => {
+    const a = await sessionA();
+    const b = await sessionB();
+
+    // Ensure unblocked state: try to delete any existing block B->A (ignore outcome)
+    await rawGraphql(DELETE_BLOCK, { blockerId: b.userId, blockedId: a.userId }, b.token);
+
+    // Send several messages from A to B
+    const contents = ['m1', 'm2', 'm3'];
+    for (const body of contents) {
+      const r = await rawGraphql(SEND_MESSAGE, { recipientId: b.userId, body }, a.token);
+      expect(r.errors).toBeUndefined();
+    }
+
+    // Query thread ordered asc, limit 2
+    const page1 = await rawGraphql(
+      `query($otherId: uuid!){ messages(where:{ _or:[{sender_id:{_eq:$otherId}},{recipient_id:{_eq:$otherId}}]}, order_by:{ created_at: asc }, limit:2){ body created_at } }`,
+      { otherId: b.userId },
+      a.token
+    );
+    expect(page1.errors).toBeUndefined();
+    expect(page1.data?.messages?.length).toBeGreaterThanOrEqual(2);
+
+    // Next page with offset
+    const page2 = await rawGraphql(
+      `query($otherId: uuid!){ messages(where:{ _or:[{sender_id:{_eq:$otherId}},{recipient_id:{_eq:$otherId}}]}, order_by:{ created_at: asc }, limit:2, offset:2){ body created_at } }`,
+      { otherId: b.userId },
+      a.token
+    );
+    expect(page2.errors).toBeUndefined();
+    // Ensure no overlap by comparing bodies
+    const bodies1 = new Set((page1.data?.messages ?? []).map((m:any)=>m.body));
+    const overlap = (page2.data?.messages ?? []).some((m:any)=>bodies1.has(m.body));
+    expect(overlap).toBe(false);
+  });
 });

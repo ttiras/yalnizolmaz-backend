@@ -1,0 +1,6 @@
+CREATE TABLE public.post_bookmarks (
+  user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  post_id uuid NOT NULL REFERENCES public.posts(id) ON DELETE CASCADE,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  PRIMARY KEY (user_id, post_id)
+);

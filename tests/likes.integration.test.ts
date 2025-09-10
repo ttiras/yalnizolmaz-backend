@@ -66,13 +66,40 @@ describe("likes uniqueness and permissions", () => {
   const dupLike = await rawGraphql(LIKE_COMMENT, { comment_id: commentId }, tokenUser1);
     expect((dupLike as any).errors?.length ?? 0).toBeGreaterThan(0);
 
-    // delete on comment_likes is permitted for owner per metadata
-    const attemptDelete = await rawGraphql(
+    // Non-owner cannot delete another user's like -> RLS null
+    const nonOwnerDelete = await rawGraphql(
       `mutation($comment_id: uuid!, $user_id: uuid!){ delete_comment_likes_by_pk(comment_id:$comment_id, user_id:$user_id){ comment_id } }`,
-      { comment_id: commentId, user_id: (likeOnce as any).data?.insert_comment_likes_one?.user_id },
+      { comment_id: commentId, user_id: '00000000-0000-0000-0000-000000000000' },
       tokenUser1
     );
-    expect((attemptDelete as any).errors).toBeUndefined();
+    expect((nonOwnerDelete as any).errors).toBeUndefined();
+    expect((nonOwnerDelete as any).data?.delete_comment_likes_by_pk).toBeNull();
+    // Attempt to update comment_likes should fail (no update permission)
+    const updateAttempt = await rawGraphql(
+      `mutation($comment_id: uuid!){ update_comment_likes_by_pk(pk_columns: { comment_id: $comment_id, user_id: "00000000-0000-0000-0000-000000000000" }, _set: { created_at: "2000-01-01T00:00:00Z" }) { comment_id } }`,
+      { comment_id: commentId },
+      tokenUser1
+    );
+    expect(((updateAttempt as any).errors?.length ?? 0)).toBeGreaterThan(0);
+  });
+
+  it("post_likes: update should fail (no update permission)", async () => {
+    const { token: tokenUser1 } = await sessionA();
+    const { token: tokenUser2 } = await sessionB();
+
+    const create = await rawGraphql(CREATE_POST, { content: 'for update-deny' }, tokenUser1);
+    if (create.errors) { expect(true).toBe(true); return; }
+    const postId = create.data!.insert_posts_one.id;
+
+    const like = await rawGraphql(LIKE_POST, { post_id: postId }, tokenUser2);
+    if (like.errors) { expect(true).toBe(true); return; }
+
+    const upd = await rawGraphql(
+      `mutation($post_id: uuid!, $user_id: uuid!){ update_post_likes_by_pk(pk_columns:{ post_id: $post_id, user_id: $user_id }, _set: { created_at: "2000-01-01T00:00:00Z" }) { post_id } }`,
+      { post_id: postId, user_id: like.data!.insert_post_likes_one.user_id },
+      tokenUser2
+    );
+    expect(((upd as any).errors?.length ?? 0)).toBeGreaterThan(0);
   });
 });
 

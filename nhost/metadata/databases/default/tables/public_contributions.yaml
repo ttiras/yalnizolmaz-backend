@@ -1,0 +1,107 @@
+table:
+  name: contributions
+  schema: public
+object_relationships:
+  - name: user
+    using:
+      foreign_key_constraint_on: submitted_by
+array_relationships:
+  - name: contribution_bookmarks
+    using:
+      foreign_key_constraint_on:
+        column: contribution_id
+        table:
+          name: contribution_bookmarks
+          schema: public
+  - name: contribution_likes
+    using:
+      foreign_key_constraint_on:
+        column: contribution_id
+        table:
+          name: contribution_likes
+          schema: public
+insert_permissions:
+  - role: user
+    permission:
+      check:
+        submitted_by:
+          _eq: X-Hasura-User-Id
+      set:
+        submitted_by: x-hasura-User-Id
+      columns:
+        - blog_slug
+        - created_at
+        - external_id
+        - id
+        - note
+        - poster_url
+        - source_url
+        - status
+        - title
+        - type
+        - updated_at
+        - year
+    comment: ""
+select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+        - year
+        - blog_slug
+        - external_id
+        - note
+        - poster_url
+        - source_url
+        - status
+        - title
+        - type
+        - created_at
+        - updated_at
+        - id
+        - submitted_by
+      filter: {}
+    comment: ""
+  - role: user
+    permission:
+      columns:
+        - year
+        - blog_slug
+        - external_id
+        - note
+        - poster_url
+        - source_url
+        - status
+        - title
+        - type
+        - created_at
+        - updated_at
+        - id
+        - submitted_by
+      filter: {}
+    comment: ""
+update_permissions:
+  - role: user
+    permission:
+      columns:
+        - blog_slug
+        - external_id
+        - note
+        - poster_url
+        - source_url
+        - status
+        - title
+        - type
+        - updated_at
+        - year
+      filter:
+        submitted_by:
+          _eq: X-Hasura-User-Id
+      check: null
+    comment: ""
+delete_permissions:
+  - role: user
+    permission:
+      filter:
+        submitted_by:
+          _eq: X-Hasura-User-Id
+    comment: ""
