@@ -1,0 +1,3 @@
+table:
+  name: contribution_types
+  schema: public
