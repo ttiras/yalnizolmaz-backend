@@ -19,12 +19,9 @@ insert_permissions:
               _neq: X-Hasura-User-Id
           - receiver:
               _and:
-                - _or:
-                    - metadata:
-                        _is_null: true
-                    - _not:
-                        metadata:
-                          _has_key: dms_off
+                - user_preferences:
+                    dms_off:
+                      _eq: false
                 - _not:
                     blocks_outgoing:
                       blocked_id:
