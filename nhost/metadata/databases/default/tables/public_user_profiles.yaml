@@ -14,48 +14,29 @@ insert_permissions:
       set:
         user_id: x-hasura-User-Id
       columns:
-        - avatar_url
         - bio
         - created_at
-        - display_name
         - location
         - updated_at
         - website
     comment: ""
 select_permissions:
-  - role: anonymous
-    permission:
-      columns:
-        - avatar_url
-        - bio
-        - display_name
-        - location
-        - website
-        - created_at
-        - updated_at
-        - user_id
-      filter: {}
-    comment: ""
   - role: user
     permission:
       columns:
-        - avatar_url
         - bio
-        - display_name
-        - location
-        - website
         - created_at
+        - location
         - updated_at
         - user_id
+        - website
       filter: {}
     comment: ""
 update_permissions:
   - role: user
     permission:
       columns:
-        - avatar_url
         - bio
-        - display_name
         - location
         - updated_at
         - website
