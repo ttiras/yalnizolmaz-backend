@@ -75,6 +75,18 @@ describe("Hasura metadata permissions", () => {
     expect(objectRels).toEqual(expect.arrayContaining(["post_comment", "user"]));
     expect(hasRole(m.insert_permissions, "user")).toBe(true);
   });
+
+  it("user_profiles has relationships and user CRUD permissions scoped by user_id", () => {
+    const m = readTableMetadata("public_user_profiles.yaml");
+    expect(m.table).toEqual({ name: "user_profiles", schema: "public" });
+    const objectRels = m.object_relationships?.map((r) => r.name) ?? [];
+    expect(objectRels).toEqual(expect.arrayContaining(["user"]));
+    expect(hasRole(m.insert_permissions, "user")).toBe(true);
+    expect(hasRole(m.select_permissions, "user")).toBe(true);
+    expect(hasRole(m.select_permissions, "public")).toBe(false);
+    expect(hasRole(m.update_permissions, "user")).toBe(true);
+    expect(hasRole(m.delete_permissions, "user")).toBe(true);
+  });
 });
 
 
