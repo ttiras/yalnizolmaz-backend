@@ -36,6 +36,7 @@ select_permissions:
         - contribution_id
         - user_id
       filter: {}
+      allow_aggregations: true
     comment: ""
 delete_permissions:
   - role: user
