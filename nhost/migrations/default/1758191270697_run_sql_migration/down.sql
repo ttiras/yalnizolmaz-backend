@@ -1,0 +1,6 @@
+-- Could not auto-generate a down migration.
+-- Please write an appropriate down migration for the SQL below:
+-- -- as a user that has CREATE on schema public
+-- create or replace view public.users_public as
+-- select id, display_name, avatar_url, created_at
+-- from auth.users;
