@@ -41,7 +41,7 @@ insert_permissions:
         - updated_at
     comment: ""
 select_permissions:
-  - role: anonymous
+  - role: public
     permission:
       columns:
         - is_helpful
@@ -53,6 +53,7 @@ select_permissions:
         - parent_id
         - user_id
       filter: {}
+      allow_aggregations: true
     comment: ""
   - role: user
     permission:
@@ -66,6 +67,7 @@ select_permissions:
         - parent_id
         - user_id
       filter: {}
+      allow_aggregations: true
     comment: ""
 update_permissions:
   - role: user

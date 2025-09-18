@@ -99,6 +99,111 @@ array_relationships:
         table:
           name: user_blocks
           schema: public
+  - name: blog_comment_helpfuls
+    using:
+      foreign_key_constraint_on:
+        column: user_id
+        table:
+          name: blog_comment_helpful
+          schema: public
+  - name: blog_comment_reports
+    using:
+      foreign_key_constraint_on:
+        column: reporter_id
+        table:
+          name: blog_comment_reports
+          schema: public
+  - name: blog_comments
+    using:
+      foreign_key_constraint_on:
+        column: user_id
+        table:
+          name: blog_comments
+          schema: public
+  - name: comment_likes
+    using:
+      foreign_key_constraint_on:
+        column: user_id
+        table:
+          name: comment_likes
+          schema: public
+  - name: contribution_bookmarks
+    using:
+      foreign_key_constraint_on:
+        column: user_id
+        table:
+          name: contribution_bookmarks
+          schema: public
+  - name: contribution_likes
+    using:
+      foreign_key_constraint_on:
+        column: user_id
+        table:
+          name: contribution_likes
+          schema: public
+  - name: contribution_reports
+    using:
+      foreign_key_constraint_on:
+        column: reporter_id
+        table:
+          name: contribution_reports
+          schema: public
+  - name: contributions
+    using:
+      foreign_key_constraint_on:
+        column: submitted_by
+        table:
+          name: contributions
+          schema: public
+  - name: messages_received
+    using:
+      foreign_key_constraint_on:
+        column: recipient_id
+        table:
+          name: messages
+          schema: public
+  - name: messages_sent
+    using:
+      foreign_key_constraint_on:
+        column: sender_id
+        table:
+          name: messages
+          schema: public
+  - name: post_bookmarks
+    using:
+      foreign_key_constraint_on:
+        column: user_id
+        table:
+          name: post_bookmarks
+          schema: public
+  - name: post_comments
+    using:
+      foreign_key_constraint_on:
+        column: user_id
+        table:
+          name: post_comments
+          schema: public
+  - name: post_likes
+    using:
+      foreign_key_constraint_on:
+        column: user_id
+        table:
+          name: post_likes
+          schema: public
+  - name: post_reports
+    using:
+      foreign_key_constraint_on:
+        column: reporter_id
+        table:
+          name: post_reports
+          schema: public
+  - name: posts
+    using:
+      foreign_key_constraint_on:
+        column: user_id
+        table:
+          name: posts
+          schema: public
   - name: refreshTokens
     using:
       foreign_key_constraint_on:
@@ -127,6 +232,13 @@ array_relationships:
         table:
           name: user_providers
           schema: auth
+  - name: user_blocks
+    using:
+      foreign_key_constraint_on:
+        column: blocked_id
+        table:
+          name: user_blocks
+          schema: public
   - name: user_preferences
     using:
       foreign_key_constraint_on:
@@ -142,7 +254,7 @@ array_relationships:
           name: user_profiles
           schema: public
 select_permissions:
-  - role: anonymous
+  - role: public
     permission:
       columns:
         - avatar_url

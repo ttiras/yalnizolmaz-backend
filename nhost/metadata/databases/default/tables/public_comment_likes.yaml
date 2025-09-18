@@ -21,13 +21,14 @@ insert_permissions:
         - created_at
     comment: ""
 select_permissions:
-  - role: anonymous
+  - role: public
     permission:
       columns:
         - created_at
         - comment_id
         - user_id
       filter: {}
+      allow_aggregations: true
     comment: ""
   - role: user
     permission:
@@ -36,6 +37,7 @@ select_permissions:
         - comment_id
         - user_id
       filter: {}
+      allow_aggregations: true
     comment: ""
 delete_permissions:
   - role: user
