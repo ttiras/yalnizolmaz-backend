@@ -1,0 +1,3 @@
+table:
+  name: reaction_types
+  schema: public

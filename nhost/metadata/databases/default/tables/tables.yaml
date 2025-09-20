@@ -23,6 +23,7 @@
 - "!include public_post_likes.yaml"
 - "!include public_post_reports.yaml"
 - "!include public_posts.yaml"
+- "!include public_reaction_types.yaml"
 - "!include public_user_blocks.yaml"
 - "!include public_user_preferences.yaml"
 - "!include public_user_profiles.yaml"
