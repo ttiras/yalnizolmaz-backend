@@ -27,6 +27,13 @@ array_relationships:
         table:
           name: contribution_likes
           schema: public
+  - name: contribution_reactions
+    using:
+      foreign_key_constraint_on:
+        column: contribution_id
+        table:
+          name: contribution_reactions
+          schema: public
 insert_permissions:
   - role: user
     permission:
