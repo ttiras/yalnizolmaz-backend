@@ -18,6 +18,7 @@
 - "!include public_contribution_reports.yaml"
 - "!include public_contribution_types.yaml"
 - "!include public_contributions.yaml"
+- "!include public_message_typing.yaml"
 - "!include public_messages.yaml"
 - "!include public_post_bookmarks.yaml"
 - "!include public_post_comments.yaml"

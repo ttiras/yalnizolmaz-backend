@@ -1,0 +1,49 @@
+table:
+  name: message_typing
+  schema: public
+insert_permissions:
+  - role: user
+    permission:
+      check:
+        _and:
+          - sender_id:
+              _eq: X-Hasura-User-Id
+          - recipient_id:
+              _neq: X-Hasura-User-Id
+      set:
+        sender_id: x-hasura-User-Id
+      columns:
+        - created_at
+        - id
+        - is_typing
+        - recipient_id
+        - updated_at
+    comment: ""
+select_permissions:
+  - role: user
+    permission:
+      columns:
+        - is_typing
+        - created_at
+        - updated_at
+        - id
+        - recipient_id
+        - sender_id
+      filter:
+        _or:
+          - recipient_id:
+              _eq: X-Hasura-User-Id
+          - sender_id:
+              _eq: X-Hasura-User-Id
+    comment: ""
+update_permissions:
+  - role: user
+    permission:
+      columns:
+        - is_typing
+        - updated_at
+      filter:
+        sender_id:
+          _eq: X-Hasura-User-Id
+      check: null
+    comment: ""

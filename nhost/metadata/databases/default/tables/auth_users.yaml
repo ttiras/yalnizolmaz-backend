@@ -277,6 +277,7 @@ select_permissions:
         - created_at
         - display_name
         - id
+        - last_seen
       filter: {}
     comment: ""
 update_permissions:
@@ -285,6 +286,7 @@ update_permissions:
       columns:
         - avatar_url
         - display_name
+        - last_seen
         - metadata
         - phone_number
       filter:
