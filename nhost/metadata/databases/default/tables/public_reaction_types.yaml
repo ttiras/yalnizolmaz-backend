@@ -1,3 +1,4 @@
 table:
   name: reaction_types
   schema: public
+is_enum: true
